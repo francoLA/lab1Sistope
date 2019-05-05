@@ -3,7 +3,10 @@
 
 int main(int argc, char const *argv[])
 {
-    write(STDOUT_FILENO, argv[1], 33);
+    char buffer[100];
+
+    read(STDIN_FILENO,buffer,100);
+    write(STDOUT_FILENO, buffer, 100);
 
     //Hijo entrega info.
     return 0;

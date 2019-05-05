@@ -93,14 +93,25 @@ int main(int argc, char const *argv[])
         if( pid == 0)
         {
             //Hijo
-            char num[5];
+            /*
+            char pipeA-0-I = arregloHijos[i]->pipeA[0];
+            char pipeA-1-I = arregloHijos[i]->pipeA[1];
+            char pipeB-0-I = arregloHijos[i]->pipeB[0];
+            char pipeB-1-I = arregloHijos[i]->pipeB[1];
+            char pipeA-0-S[3];
+            char pipeA-1-S[3];
+            char pipeB-0-S[3];
+            char pipeB-1-S[3];
+            */
+            char num[100];
             sprintf(num, "%d", i);
+
+
+
             char *args[]= {"./vis",num,NULL};
             
             dup2(arregloHijos[i]->pipeA[WRITE],STDOUT_FILENO);
             close(arregloHijos[i]->pipeA[READ]); 
-            
-            write(arregloHijos[i]->pipeA[WRITE],"Te mande esto hijo",100);
 
             dup2(arregloHijos[i]->pipeB[READ],STDIN_FILENO);
             close(arregloHijos[i]->pipeB[WRITE]);
@@ -111,7 +122,10 @@ int main(int argc, char const *argv[])
         else
         {
             //Lectura de cada salida de los hijos.
+            write(arregloHijos[i]->pipeB[WRITE],"Hola hijo",100);
+
             read(arregloHijos[i]->pipeA[READ], buffer, 100);
+
             printf("Padre: %s\n", buffer);
             //Padre
         }
