@@ -20,6 +20,11 @@ hijo* crearHijo()
     return hijoActual;
 }
 
+void leerArchivo()
+{
+    
+}
+
 int main(int argc, char const *argv[])
 {
     int cantidadHijos = 10;
@@ -57,30 +62,32 @@ int main(int argc, char const *argv[])
         else
         {
             //Lectura de cada salida de los hijos.
-            write(arregloHijos[i]->pipeB[WRITE],"Hola hijoA",100);
-            write(arregloHijos[i]->pipeB[WRITE],"Hola hijoB",100);
-            write(arregloHijos[i]->pipeB[WRITE],"Hola hijoC",100);
-            write(arregloHijos[i]->pipeB[WRITE],"EXIT",100);
-            
+            for(int j = 0 ; j < i ; j++)
+            {
+                write(arregloHijos[i]->pipeB[WRITE],"Hola hijoA",100);
+            }
         }
     }
-    //Necesario?
-        for(int i = 0 ; i < cantidadHijos;i++)
-        {
-            wait(NULL);
-        }
-        for(int i = 0 ; i < cantidadHijos;i++)
-        {
-            read(arregloHijos[i]->pipeA[READ], buffer, 100);
-            printf("Padre: %s\n", buffer);
-        }    
-        for(int i = 0 ; i < cantidadHijos;i++)
-        {
-            close(arregloHijos[i]->pipeA[WRITE]);
-            close(arregloHijos[i]->pipeA[READ]);
-            close(arregloHijos[i]->pipeB[WRITE]);
-            close(arregloHijos[i]->pipeB[READ]);
-        }
+    
+    for(int i = 0 ; i < cantidadHijos;i++)
+    {
+        write(arregloHijos[i]->pipeB[WRITE],"FIN",100);
+        wait(NULL);
+    }
+    for(int i = 0 ; i < cantidadHijos;i++)
+    {
+        read(arregloHijos[i]->pipeA[READ], buffer, 100);
+        printf("Padre: %s\n", buffer);
+    }    
+    for(int i = 0 ; i < cantidadHijos;i++)
+    {
+        close(arregloHijos[i]->pipeA[WRITE]);
+        close(arregloHijos[i]->pipeA[READ]);
+        close(arregloHijos[i]->pipeB[WRITE]);
+        close(arregloHijos[i]->pipeB[READ]);
+    }
+
+    //Matar Hijos.
     
     return 0;
 }
