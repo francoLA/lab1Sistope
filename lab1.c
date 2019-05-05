@@ -6,7 +6,7 @@
 #define READ 0
 #define WRITE 1
 
-typedef struct nodoHijo
+typedef struct children
 {
     int pipeA[2];
     int pipeB[2];
@@ -23,6 +23,7 @@ hijo* crearHijo()
 int main(int argc, char const *argv[])
 {
     int cantidadHijos = 10;
+    int pid;
     hijo* arregloHijos[cantidadHijos];
 
     int arregloEntrada[10] = {1,2,3,4,5,6,7,8,9,10};
@@ -32,14 +33,13 @@ int main(int argc, char const *argv[])
         arregloHijos[i] = crearHijo();
         pipe(arregloHijos[i]->pipeA);
         pipe(arregloHijos[i]->pipeB);
-        printf("%d,%d\n",arregloHijos[i]->pipeA[0],arregloHijos[i]->pipeA[1]);
     }
 
     char buffer[100];
 
     for(int i = 0 ; i < cantidadHijos;i++)
     {
-        int pid = fork();
+        pid = fork();
         if( pid == 0)
         {
             char num[100];
@@ -57,13 +57,30 @@ int main(int argc, char const *argv[])
         else
         {
             //Lectura de cada salida de los hijos.
-            write(arregloHijos[i]->pipeB[WRITE],"Hola hijo",100);
-
-            read(arregloHijos[i]->pipeA[READ], buffer, 100);
-
-            printf("Padre: %s\n", buffer);
-            //Padre
+            write(arregloHijos[i]->pipeB[WRITE],"Hola hijoA",100);
+            write(arregloHijos[i]->pipeB[WRITE],"Hola hijoB",100);
+            write(arregloHijos[i]->pipeB[WRITE],"Hola hijoC",100);
+            write(arregloHijos[i]->pipeB[WRITE],"EXIT",100);
+            
         }
     }
+    //Necesario?
+        for(int i = 0 ; i < cantidadHijos;i++)
+        {
+            wait(NULL);
+        }
+        for(int i = 0 ; i < cantidadHijos;i++)
+        {
+            read(arregloHijos[i]->pipeA[READ], buffer, 100);
+            printf("Padre: %s\n", buffer);
+        }    
+        for(int i = 0 ; i < cantidadHijos;i++)
+        {
+            close(arregloHijos[i]->pipeA[WRITE]);
+            close(arregloHijos[i]->pipeA[READ]);
+            close(arregloHijos[i]->pipeB[WRITE]);
+            close(arregloHijos[i]->pipeB[READ]);
+        }
+    
     return 0;
 }
