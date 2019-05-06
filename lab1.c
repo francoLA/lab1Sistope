@@ -47,10 +47,15 @@ entrada* crearEntrada()
 entrada* analizarEntradas(int argc,char const *argv[])
 {
     entrada *p_entrada = crearEntrada();
-    if(argc < 9 || argc > 10)
+    if(argc < 9)
     {
-        printf("Verifique los archivos de entrada\n");
+        printf("Faltan parametros, verifique los datos de entrada\n");
         exit(0);
+    }
+    else if(argc > 10)
+    {
+        printf("Demasiados parametros, verifique los datos de entrada\n");
+        exit(0);        
     }
     else
     {
@@ -71,7 +76,7 @@ entrada* analizarEntradas(int argc,char const *argv[])
         }
         if(p_entrada->ancho == -1 ||p_entrada->ndiscos == -1 || strncmp(p_entrada->archivoV,"null",3) == 0 || strncmp(p_entrada->archivoS,"null",3) == 0)
         {
-            printf("Verifique que ingreso todos los parametros de entrada\n");
+            printf("Faltan parametros, verifique los datos de entrada\n");
             exit(0);
         }
         else
@@ -83,7 +88,7 @@ entrada* analizarEntradas(int argc,char const *argv[])
 
 int main(int argc, char const *argv[])
 {
-    entrada* entradas = analizarEntradas(argc, argv);
+    //entrada* entradas = analizarEntradas(argc, argv);
 
     int cantidadHijos = 10;
     int pid;
