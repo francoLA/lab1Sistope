@@ -4,11 +4,11 @@
 #include <string.h>
 #include "structs.h"
 
-int mediaReal(datos* datos, int acumulador){return datos->real + acumulador;}
-int medianaImaginaria(datos* datos, int acumulador){return datos->imag + acumulador;}
-int ruidoTotal(datos* datos, int acumulador){return datos->ruido + acumulador;}
-int potencia(datos* datos, int acumulador){
-    int resultadoA = (datos->real^2 + datos->imag^2)^(1/2);
+float mediaReal(datos* datos, float acumulador){return datos->real + acumulador;}
+float medianaImaginaria(datos* datos, float acumulador){return datos->imag + acumulador;}
+float ruidoTotal(datos* datos, float acumulador){return datos->ruido + acumulador;}
+float potencia(datos* datos, float acumulador){
+    float resultadoA = (int)(datos->real*datos->real + datos->imag*datos->imag)^(1/2);
     return resultadoA + acumulador;
 }
 
@@ -23,7 +23,7 @@ datos* descifrarEntrada(datos* p_datos, char* entrada)
     return p_datos;
 }
 
-char* cifrarSalida(int mediaReal, int medianaImag, int ruidoTotal, int potencia)
+char* cifrarSalida(float mediaReal, float medianaImag, float ruidoTotal, float potencia)
 {
     return "hola";
 }
@@ -34,10 +34,10 @@ int main(int argc, char const *argv[])
     char buffer[100];
     int verificacion = 0;
     int cantidadVisibilidades = 0;
-    int acumMedia = 0;
-    int acumMediana = 0;
-    int acumRuido = 0;
-    int acumPoten= 0;
+    float acumMedia = 0;
+    float acumMediana = 0;
+    float acumRuido = 0;
+    float acumPoten= 0;
     datos *datos = crearTabla();
     
     while(verificacion == 0)

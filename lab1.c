@@ -10,6 +10,8 @@
 #define WRITE 1
 #define NUMEROENTRADAS 5
 
+char* parametros[NUMEROENTRADAS] = {"-i","-o","-n","-d","-b"};
+
 hijo* crearHijo()
 {
     hijo *p_hijo = malloc(sizeof(hijo));
@@ -17,9 +19,20 @@ hijo* crearHijo()
     return p_hijo;
 }
 
-datos *crearDato(){
+entrada* crearEntrada()
+{
+    entrada *p_entrada = malloc(sizeof(entrada));
+    p_entrada->archivoV = "null";
+    p_entrada->archivoS = "null";
+    p_entrada->ancho = -1;
+    p_entrada->ndiscos = -1;
+    p_entrada->bandera = 0;
+    return p_entrada;
+}
 
+datos *crearDato(){
     datos *nuevo = malloc(sizeof(datos));
+    return nuevo;
 }
 
 int cantidadDatos(const char *nombreArchivo){
@@ -115,17 +128,19 @@ int main(int argc, char const *argv[])
     //entrada* entradas = analizarEntradas(argc, argv);
 
     int cantidadHijos = 10;
-    int cantidadDat = cantidadDatos(argv[1]);
+
+    //int cantidadDat = cantidadDatos(argv[1]);
+
     int pid;
     hijo* arregloHijos[cantidadHijos];
-    datos* data[cantidadDat];
-    leerArchivo(argv[1], data);
+    //datos* data[cantidadDat];
+    //leerArchivo(argv[1], data);
 
-    printf("%f\n", data[5] -> ruido);
+    //printf("%f\n", data[5] -> ruido);
 
     int arregloEntrada[10] = {1,2,3,4,5,6,7,8,9,10};
 
-    /*for(int i = 0 ; i < cantidadHijos;i++)
+    for(int i = 0 ; i < cantidadHijos;i++)
     {
         arregloHijos[i] = crearHijo();
         pipe(arregloHijos[i]->pipeA);
@@ -175,7 +190,7 @@ int main(int argc, char const *argv[])
         close(arregloHijos[i]->pipeA[READ]);
         close(arregloHijos[i]->pipeB[WRITE]);
         close(arregloHijos[i]->pipeB[READ]);
-    }*/
+    }
 
     //Matar Hijos.
     

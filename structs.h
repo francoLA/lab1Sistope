@@ -19,5 +19,14 @@ typedef struct inputData
     float ruido;
 }datos;
 
+typedef struct inputParameters
+{
+    const char *archivoV;
+    const char *archivoS;
+    int ndiscos;
+    int ancho;
+    int bandera;
+}entrada;
+
 
 #endif
