@@ -54,7 +54,7 @@ int main(int argc, char const *argv[])
         if(strncmp("FIN",buffer,3) == 0){
             verificacion = 1;
             break;}
-        datos = descifrarEntrada(datos, buffer);
+        //xdatos = descifrarEntrada(datos, buffer);
         cantidadVisibilidades++;
         //Funciones de calculo con los datos
     }
@@ -64,7 +64,7 @@ int main(int argc, char const *argv[])
     //Cifrar resultados y entregarlos al papa.
     char * num;
 
-    sprintf(num, "%d", a);
+    sprintf(num, "%d", cantidadVisibilidades);
     write(STDOUT_FILENO, num, 100);
 
     return 0;
