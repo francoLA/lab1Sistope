@@ -2,16 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "structs.h"
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #define READ 0
 #define WRITE 1
-
-typedef struct children
-{
-    int pipeA[2];
-    int pipeB[2];
-    int pid;
-}hijo;
 
 hijo* crearHijo()
 {
@@ -20,20 +16,70 @@ hijo* crearHijo()
     return hijoActual;
 }
 
-void leerArchivo()
+datos *crearDato(){
+
+    datos *nuevo = malloc(sizeof(datos));
+}
+
+int cantidadDatos(const char *nombreArchivo){
+
+    FILE *archivo;
+    int cantidad = 0;
+    char aux[1000];
+    archivo = fopen(nombreArchivo, "r");
+
+    while(feof(archivo) == 0){
+        fscanf(archivo, "%s", aux);
+        cantidad ++;
+    }
+
+    fclose(archivo);
+
+    return cantidad;
+}
+
+void leerArchivo(const char *nombreArchivo, datos *data[])
 {
-    
+    FILE *archivo;
+    archivo = fopen(nombreArchivo, "r");
+    int cantidad = cantidadDatos(nombreArchivo);
+
+    char aux2[50];
+    char aux3[50];
+    char aux4[50];
+    char aux5[50];
+    char aux6[50];
+
+    for (int i = 0; i < cantidad; ++i)
+    {
+        datos *nuevo = crearDato();
+        fscanf(archivo, " %[^','], %[^','], %[^','], %[^','], %s",aux2, aux3, aux4, aux5, aux6);
+        sscanf(aux2, "%f", &nuevo -> u);
+        sscanf(aux3, "%f", &nuevo -> v);
+        sscanf(aux4, "%f", &nuevo -> real);
+        sscanf(aux5, "%f", &nuevo -> imag);
+        sscanf(aux6, "%f", &nuevo -> ruido);
+        data[i] = nuevo;
+    }
+
+    fclose(archivo);
+
 }
 
 int main(int argc, char const *argv[])
 {
     int cantidadHijos = 10;
+    int cantidadDat = cantidadDatos(argv[1]);
     int pid;
     hijo* arregloHijos[cantidadHijos];
+    datos* data[cantidadDat];
+    leerArchivo(argv[1], data);
+
+    printf("%f\n", data[5] -> ruido);
 
     int arregloEntrada[10] = {1,2,3,4,5,6,7,8,9,10};
 
-    for(int i = 0 ; i < cantidadHijos;i++)
+    /*for(int i = 0 ; i < cantidadHijos;i++)
     {
         arregloHijos[i] = crearHijo();
         pipe(arregloHijos[i]->pipeA);
@@ -85,7 +131,7 @@ int main(int argc, char const *argv[])
         close(arregloHijos[i]->pipeA[READ]);
         close(arregloHijos[i]->pipeB[WRITE]);
         close(arregloHijos[i]->pipeB[READ]);
-    }
+    }*/
 
     //Matar Hijos.
     

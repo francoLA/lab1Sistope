@@ -2,15 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-
-typedef struct inputData
-{
-    int u;
-    int v;
-    int real;
-    int imag;
-    int ruido;
-}datos;
+#include "structs.h"
 
 int mediaReal(datos* datos, int acumulador){return datos->real + acumulador;}
 int medianaImaginaria(datos* datos, int acumulador){return datos->imag + acumulador;}
