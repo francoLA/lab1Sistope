@@ -44,14 +44,11 @@ int cantidadDatos(const char *nombreArchivo){
     int cantidad = 0;
     char aux[1000];
     archivo = fopen(nombreArchivo, "r");
-
     while(feof(archivo) == 0){
         fscanf(archivo, "%s", aux);
         cantidad ++;
     }
-
     fclose(archivo);
-
     return cantidad;
 }
 
@@ -60,7 +57,6 @@ void leerArchivo(const char *nombreArchivo, datos *data[])
     FILE *archivo;
     archivo = fopen(nombreArchivo, "r");
     int cantidad = cantidadDatos(nombreArchivo);
-
     char aux2[50];
     char aux3[50];
     char aux4[50];
@@ -81,8 +77,6 @@ void leerArchivo(const char *nombreArchivo, datos *data[])
     fclose(archivo);
 
 }
-
-
 
 entrada* analizarEntradas(int argc,char const *argv[])
 {
@@ -198,7 +192,6 @@ int main(int argc, char const *argv[])
     {
         datos* dato = data[i];
         float distancia = distanciaVisibilidad(dato);
-        printf("Distancia = %f\n",distancia);
         float limInferior = 0;
         float limSuperior = ancho;
         int datoPosicionado = 0;
@@ -226,20 +219,22 @@ int main(int argc, char const *argv[])
     {
         write(arregloHijos[i]->pipeB[WRITE],"FIN",100);
         wait(NULL);
-        printf("Termino hijo\n");
     }
 
     //Leer info obtenida por hijo.
+
+    FILE *file = fopen(entradas->archivoS,"w");
+
     for(int i = 0 ; i < cantidadHijos;i++)
     {
         read(arregloHijos[i]->pipeA[READ], buffer, 300);
-
-        if(entradas->bandera == 1){
-            
-        }
-        printf("\nDisco %d\n%s\n",i+1,buffer);
+        char *palabra = strtok(buffer,"@");
+        fputs(palabra,file);
+        palabra = strtok(NULL,"@");
+        if(entradas->bandera == 1){printf("%s",palabra);}
     }    
-    printf("\n");
+    
+    fclose(file);
 
     //Cerrar pipes
     for(int i = 0 ; i < cantidadHijos;i++)
