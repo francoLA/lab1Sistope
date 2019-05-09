@@ -145,26 +145,58 @@ char* cifrarDatos(datos *datos)
     return datosCifrados;
 }
 
+void posicionarDatos(int cantidadDat, datos* data[], hijo* arregloHijos[], entrada* entradas){
 
-int main(int argc, char const *argv[])
-{
-    entrada* entradas = analizarEntradas(argc, argv);
-    int cantidadHijos = entradas->ndiscos;
-    int pid;
-    char buffer[300];
-    const char* nombreArchivo = entradas->archivoV;
-    int cantidadDat = cantidadDatos(nombreArchivo);
-    hijo* arregloHijos[cantidadHijos];
+    for(int i = 0 ; i < cantidadDat;i++)
+    {
+        datos* dato = data[i];
+        float distancia = distanciaVisibilidad(dato);
+        float limInferior = 0;
+        float limSuperior = entradas -> ancho;
+        int datoPosicionado = 0;
+        int discoDelDato = 0;
+        //Funcion para posicionar.
 
-    datos* data[cantidadDat];
-    leerArchivo(nombreArchivo, data);
-
-    for(int i = 0 ; i < cantidadHijos;i++){
-        arregloHijos[i] = crearHijo();
-        pipe(arregloHijos[i]->pipeA);
-        pipe(arregloHijos[i]->pipeB);
+        while(datoPosicionado == 0)
+        {
+            if( (limInferior <= distancia && limSuperior > distancia) || discoDelDato == entradas -> ndiscos-1)
+            {
+                char* datosCifrados = cifrarDatos(dato);
+                write(arregloHijos[discoDelDato]->pipeB[WRITE],datosCifrados,100);
+                datoPosicionado = 1;
+            }
+            else
+            {
+                limInferior = limSuperior;
+                limSuperior = limSuperior + entradas -> ancho;
+                discoDelDato++;
+            }
+        } 
     }
+}
+
+void escribirSalida(entrada* entradas, int cantidadHijos, hijo* arregloHijos[]){
+
+    char buffer[300];
+
+    FILE *file = fopen(entradas->archivoS,"w");
+
+    for(int i = 0 ; i < cantidadHijos;i++)
+    {
+        read(arregloHijos[i]->pipeA[READ], buffer, 300);
+        char *palabra = strtok(buffer,"@");
+        fputs(palabra,file);
+        palabra = strtok(NULL,"@");
+        if(entradas->bandera == 1){printf("%s",palabra);}
+    }    
     
+    fclose(file);
+}
+
+void crearHijos(int cantidadHijos, hijo* arregloHijos[]){
+
+    int pid;
+
     for(int i = 0 ; i < cantidadHijos;i++)
     {
         pid = fork();
@@ -182,38 +214,31 @@ int main(int argc, char const *argv[])
             execvp(args[0], args);
         }
     }
+}
+
+int main(int argc, char const *argv[])
+{
+    entrada* entradas = analizarEntradas(argc, argv);
+    int cantidadHijos = entradas->ndiscos;
+    const char* nombreArchivo = entradas->archivoV;
+    int cantidadDat = cantidadDatos(nombreArchivo);
+    hijo* arregloHijos[cantidadHijos];
+
+    datos* data[cantidadDat];
+    leerArchivo(nombreArchivo, data);
+
+    for(int i = 0 ; i < cantidadHijos;i++){
+        arregloHijos[i] = crearHijo();
+        pipe(arregloHijos[i]->pipeA);
+        pipe(arregloHijos[i]->pipeB);
+    }
+
+    //Creacoion de los procesos hijos.
+    crearHijos(cantidadHijos, arregloHijos);
     
     //Proceso asignacion de hijos.
-    int numeroDiscos = entradas->ndiscos;
-    int ancho = entradas->ancho;
+    posicionarDatos(cantidadDat, data, arregloHijos, entradas);
 
-    
-    for(int i = 0 ; i < cantidadDat;i++)
-    {
-        datos* dato = data[i];
-        float distancia = distanciaVisibilidad(dato);
-        float limInferior = 0;
-        float limSuperior = ancho;
-        int datoPosicionado = 0;
-        int discoDelDato = 0;
-        //Funcion para posicionar.
-
-        while(datoPosicionado == 0)
-        {
-            if( (limInferior <= distancia && limSuperior > distancia) || discoDelDato == numeroDiscos-1)
-            {
-                char* datosCifrados = cifrarDatos(dato);
-                write(arregloHijos[discoDelDato]->pipeB[WRITE],datosCifrados,100);
-                datoPosicionado = 1;
-            }
-            else
-            {
-                limInferior = limSuperior;
-                limSuperior = limSuperior + ancho;
-                discoDelDato++;
-            }
-        } 
-    }
     //Matar hijos
     for(int i = 0 ; i < cantidadHijos;i++)
     {
@@ -221,20 +246,7 @@ int main(int argc, char const *argv[])
         wait(NULL);
     }
 
-    //Leer info obtenida por hijo.
-
-    FILE *file = fopen(entradas->archivoS,"w");
-
-    for(int i = 0 ; i < cantidadHijos;i++)
-    {
-        read(arregloHijos[i]->pipeA[READ], buffer, 300);
-        char *palabra = strtok(buffer,"@");
-        fputs(palabra,file);
-        palabra = strtok(NULL,"@");
-        if(entradas->bandera == 1){printf("%s",palabra);}
-    }    
-    
-    fclose(file);
+    escribirSalida(entradas, cantidadHijos, arregloHijos);
 
     //Cerrar pipes
     for(int i = 0 ; i < cantidadHijos;i++)
