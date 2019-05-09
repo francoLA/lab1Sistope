@@ -5,10 +5,13 @@
 #include "structs.h"
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <math.h>
 
 #define READ 0
 #define WRITE 1
 #define NUMEROENTRADAS 5
+#define BUFFERLECTURA 100
+#define FLOATMAX 20
 
 char* parametros[NUMEROENTRADAS] = {"-i","-o","-n","-d","-b"};
 
@@ -75,34 +78,28 @@ void leerArchivo(const char *nombreArchivo, datos *data[])
         sscanf(aux6, "%f", &nuevo -> ruido);
         data[i] = nuevo;
     }
-
     fclose(archivo);
 
 }
 
 
+
 entrada* analizarEntradas(int argc,char const *argv[])
 {
     entrada *p_entrada = crearEntrada();
-    if(argc < 9)
-    {
+    if(argc < 9){
         printf("Faltan parametros, verifique los datos de entrada\n");
         exit(0);
     }
-    else if(argc > 10)
-    {
+    else if(argc > 10){
         printf("Demasiados parametros, verifique los datos de entrada\n");
         exit(0);        
     }
-    else
-    {
-        for(int i = 1; i < argc ; i++)
-        {
-            for(int j = 0; j < NUMEROENTRADAS;j++)
-            {
+    else{
+        for(int i = 1; i < argc ; i++){
+            for(int j = 0; j < NUMEROENTRADAS;j++){
                 char* tipoEntrada = parametros[j];
-                if(strncmp(tipoEntrada,argv[i],2) == 0)
-                {
+                if(strncmp(tipoEntrada,argv[i],2) == 0){
                     if(j == 0){p_entrada->archivoV = argv[i+1];}
                     else if(j == 1){p_entrada->archivoS = argv[i+1];}
                     else if(j == 2){p_entrada->ndiscos = atoi(argv[i+1]);}
@@ -111,43 +108,73 @@ entrada* analizarEntradas(int argc,char const *argv[])
                 }
             }
         }
-        if(p_entrada->ancho == -1 ||p_entrada->ndiscos == -1 || strncmp(p_entrada->archivoV,"null",3) == 0 || strncmp(p_entrada->archivoS,"null",3) == 0)
-        {
+        if(p_entrada->ancho == -1 ||p_entrada->ndiscos == -1 || strncmp(p_entrada->archivoV,"null",3) == 0 || strncmp(p_entrada->archivoS,"null",3) == 0){
             printf("Faltan parametros, verifique los datos de entrada\n");
             exit(0);
         }
-        else
-        {
-            return p_entrada;
-        }
+        else {return p_entrada;}
     }
+}
+
+float distanciaVisibilidad(datos *datos)
+{
+    float u = datos->u;
+    float v = datos->v;
+    float resultado = u*u + v*v;
+    return sqrtf(resultado);
+}
+
+void concatenarString(char* a, char* b)
+{
+    strcat(a, b);
+    strcat(a,",");
+}
+
+char* cifrarDatos(datos *datos)
+{
+    char *datosCifrados = malloc(sizeof(char)*BUFFERLECTURA);
+    char u[FLOATMAX];
+    char v[FLOATMAX];
+    char real[FLOATMAX];
+    char imag[FLOATMAX];
+    char ruido[FLOATMAX];
+    gcvt(datos->u, 7, u);
+    gcvt(datos->v, 7, v);
+    gcvt(datos->real, 7, real);
+    gcvt(datos->imag, 7, imag);
+    gcvt(datos->ruido, 7, ruido);
+    concatenarString(datosCifrados,u);
+    concatenarString(datosCifrados,v);
+    concatenarString(datosCifrados,real);
+    concatenarString(datosCifrados,imag);
+    strcat(datosCifrados,ruido);
+    return datosCifrados;
 }
 
 int main(int argc, char const *argv[])
 {
-    //entrada* entradas = analizarEntradas(argc, argv);
-
-    int cantidadHijos = 10;
-
-    //int cantidadDat = cantidadDatos(argv[1]);
-
+    entrada* entradas = analizarEntradas(argc, argv);
+    int cantidadHijos = entradas->ndiscos;
     int pid;
+    char buffer[100];
+    const char* nombreArchivo = entradas->archivoV;
+    int cantidadDat = cantidadDatos(nombreArchivo);
     hijo* arregloHijos[cantidadHijos];
-    //datos* data[cantidadDat];
-    //leerArchivo(argv[1], data);
 
-    //printf("%f\n", data[5] -> ruido);
+    datos* data[cantidadDat];
+    leerArchivo(nombreArchivo, data);
 
-    int arregloEntrada[10] = {1,2,3,4,5,6,7,8,9,10};
-
-    for(int i = 0 ; i < cantidadHijos;i++)
+    for(int i = 0 ; i < cantidadDat;i++)
     {
+        printf("Dato = %f\n",data[i]->u);
+    }
+
+    for(int i = 0 ; i < cantidadHijos;i++){
         arregloHijos[i] = crearHijo();
         pipe(arregloHijos[i]->pipeA);
         pipe(arregloHijos[i]->pipeB);
     }
-    char buffer[100];
-
+    
     for(int i = 0 ; i < cantidadHijos;i++)
     {
         pid = fork();
@@ -157,33 +184,68 @@ int main(int argc, char const *argv[])
             
             dup2(arregloHijos[i]->pipeA[WRITE],STDOUT_FILENO);
             close(arregloHijos[i]->pipeA[READ]); 
+            close(arregloHijos[i]->pipeA[WRITE]);
 
             dup2(arregloHijos[i]->pipeB[READ],STDIN_FILENO);
             close(arregloHijos[i]->pipeB[WRITE]);
+            close(arregloHijos[i]->pipeB[READ]);
             
-            //Entregandole por argumentos el numero de hijo.
             execvp(args[0], args);
-        }
-        else
-        {
-            //Lectura de cada salida de los hijos.
-            for(int j = 0 ; j < i ; j++)
-            {
-                write(arregloHijos[i]->pipeB[WRITE],"Hola hijoA",100);
-            }
         }
     }
     
+    //Proceso asignacion de hijos.
+    int numeroDiscos = entradas->ndiscos;
+    int ancho = entradas->ancho;
+
+    
+    for(int i = 0 ; i < cantidadDat;i++)
+    {
+        datos* dato = data[i];
+        float distancia = distanciaVisibilidad(dato);
+        printf("Distancia = %f\n",distancia);
+        float limInferior = 0;
+        float limSuperior = ancho;
+        int datoPosicionado = 0;
+        int discoDelDato = 0;
+        //Funcion para posicionar.
+
+        while(datoPosicionado == 0)
+        {
+            if( (limInferior >= distancia && limSuperior > distancia) || discoDelDato == numeroDiscos-1)
+            {
+                //char* datosCifrados = cifrarDatos(dato);
+
+                write(arregloHijos[discoDelDato]->pipeB[WRITE],dato,100);
+                datoPosicionado = 1;
+            }
+            else
+            {
+                limInferior = limSuperior;
+                limSuperior = limSuperior + ancho;
+                discoDelDato++;
+            }
+        } 
+    }
+
+    printf("Mande todo\n");
+
+    //Matar hijos
     for(int i = 0 ; i < cantidadHijos;i++)
     {
-        write(arregloHijos[i]->pipeB[WRITE],"FIN",100);
+        write(arregloHijos[i]->pipeB[WRITE],NULL,100);
         wait(NULL);
+        printf("Termino hijo\n");
     }
+
+    //Leer info obtenida por hijo.
     for(int i = 0 ; i < cantidadHijos;i++)
     {
         read(arregloHijos[i]->pipeA[READ], buffer, 100);
-        printf("Padre: %s\n", buffer);
+        printf("Padre = %s\n",buffer);
     }    
+
+    //Cerrar pipes
     for(int i = 0 ; i < cantidadHijos;i++)
     {
         close(arregloHijos[i]->pipeA[WRITE]);
@@ -192,7 +254,5 @@ int main(int argc, char const *argv[])
         close(arregloHijos[i]->pipeB[READ]);
     }
 
-    //Matar Hijos.
-    
     return 0;
 }
