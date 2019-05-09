@@ -164,11 +164,6 @@ int main(int argc, char const *argv[])
     datos* data[cantidadDat];
     leerArchivo(nombreArchivo, data);
 
-    for(int i = 0 ; i < cantidadDat;i++)
-    {
-        printf("Dato = %f\n",data[i]->u);
-    }
-
     for(int i = 0 ; i < cantidadHijos;i++){
         arregloHijos[i] = crearHijo();
         pipe(arregloHijos[i]->pipeA);
@@ -214,9 +209,9 @@ int main(int argc, char const *argv[])
         {
             if( (limInferior <= distancia && limSuperior > distancia) || discoDelDato == numeroDiscos-1)
             {
-                //char* datosCifrados = cifrarDatos(dato);
-                printf("dato = %f\n",dato->u);
-                write(arregloHijos[discoDelDato]->pipeB[WRITE],dato,sizeof(datos));
+                char* datosCifrados = cifrarDatos(dato);
+                //printf("dato = %f\n",dato->u);
+                write(arregloHijos[discoDelDato]->pipeB[WRITE],datosCifrados,100);
                 datoPosicionado = 1;
             }
             else
@@ -233,7 +228,7 @@ int main(int argc, char const *argv[])
     //Matar hijos
     for(int i = 0 ; i < cantidadHijos;i++)
     {
-        write(arregloHijos[i]->pipeB[WRITE],NULL,100);
+        write(arregloHijos[i]->pipeB[WRITE],"FIN",100);
         wait(NULL);
         printf("Termino hijo\n");
     }

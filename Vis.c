@@ -101,31 +101,31 @@ char* cifrarSalida(float mediaReal, float medianaImg, float ruidoTotal, float po
 
 int main(int argc, char const *argv[])
 {
-    datos* dato;
+    
     int verificacion = 0;
     int cantidadVisibilidades = 0;
     float acumMedia = 0;
     float acumMediana = 0;
     float acumRuido = 0;
     float acumPoten= 0;
-    datos *datos = crearTabla();
-
+    //datos *datos = crearTabla();
+    datos* dato = crearTabla();
+    char buffer[100];
+    
     while(verificacion == 0)
     {
         
-        /*
+        read(STDIN_FILENO,buffer,BUFFERLECTURA);
         if(strncmp("FIN",buffer,3) == 0){
             verificacion = 1;
             break;}
-            */
-
+        /*
         if(dato == NULL)
         {
             break;
         }
-        read(STDIN_FILENO,dato,sizeof(datos));
-        
-        //datos = descifrarEntrada(datos, buffer);
+        */
+        dato = descifrarEntrada(dato, buffer);
         acumMedia = mediaReal(dato, acumMedia);
         acumMediana = medianaImaginaria(dato, acumMediana);
         acumRuido = ruidoTotal(dato, acumRuido);
@@ -137,13 +137,9 @@ int main(int argc, char const *argv[])
     //Agregar cantidadVisibilidades a acumMedia; acumMediana. => R/cantidadVisibilidades
     
     //Cifrar resultados y entregarlos al papa.
-    
     char *salida;
     salida = cifrarSalida(acumMedia,acumMediana,acumRuido,acumPoten);
     write(STDOUT_FILENO, salida, 200);
     
-    //write(STDOUT_FILENO, "hola", 100);
-
-
     return 0;
 }
