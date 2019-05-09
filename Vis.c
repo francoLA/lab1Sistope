@@ -109,37 +109,41 @@ int main(int argc, char const *argv[])
     float acumRuido = 0;
     float acumPoten= 0;
     datos *datos = crearTabla();
-    
+
     while(verificacion == 0)
     {
-        read(STDIN_FILENO,dato,sizeof(dato));
+        
         /*
         if(strncmp("FIN",buffer,3) == 0){
             verificacion = 1;
             break;}
             */
-        if(dato != NULL)
+
+        if(dato == NULL)
         {
-            verificacion = 1;
             break;
         }
-        /*
-        datos = descifrarEntrada(datos, buffer);
+        read(STDIN_FILENO,dato,sizeof(datos));
         
-        acumMedia = mediaReal(datos, acumMedia);
-        acumMediana = medianaImaginaria(datos, acumMediana);
-        acumRuido = ruidoTotal(datos, acumRuido);
-        acumPoten = potencia(datos, acumPoten);
-        */
+        //datos = descifrarEntrada(datos, buffer);
+        acumMedia = mediaReal(dato, acumMedia);
+        acumMediana = medianaImaginaria(dato, acumMediana);
+        acumRuido = ruidoTotal(dato, acumRuido);
+        acumPoten = potencia(dato, acumPoten);
+
         cantidadVisibilidades++;
     }
     //OJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOOJJOJOJOOJOJJOOJOJJOOJOJOJOJOJOJOJOJOJO
     //Agregar cantidadVisibilidades a acumMedia; acumMediana. => R/cantidadVisibilidades
     
     //Cifrar resultados y entregarlos al papa.
+    
     char *salida;
     salida = cifrarSalida(acumMedia,acumMediana,acumRuido,acumPoten);
-    write(STDOUT_FILENO, salida, 100);
+    write(STDOUT_FILENO, salida, 200);
+    
+    //write(STDOUT_FILENO, "hola", 100);
+
 
     return 0;
 }

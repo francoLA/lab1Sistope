@@ -156,7 +156,7 @@ int main(int argc, char const *argv[])
     entrada* entradas = analizarEntradas(argc, argv);
     int cantidadHijos = entradas->ndiscos;
     int pid;
-    char buffer[100];
+    char buffer[300];
     const char* nombreArchivo = entradas->archivoV;
     int cantidadDat = cantidadDatos(nombreArchivo);
     hijo* arregloHijos[cantidadHijos];
@@ -184,11 +184,11 @@ int main(int argc, char const *argv[])
             
             dup2(arregloHijos[i]->pipeA[WRITE],STDOUT_FILENO);
             close(arregloHijos[i]->pipeA[READ]); 
-            close(arregloHijos[i]->pipeA[WRITE]);
+            //close(arregloHijos[i]->pipeA[WRITE]);
 
             dup2(arregloHijos[i]->pipeB[READ],STDIN_FILENO);
             close(arregloHijos[i]->pipeB[WRITE]);
-            close(arregloHijos[i]->pipeB[READ]);
+            //close(arregloHijos[i]->pipeB[READ]);
             
             execvp(args[0], args);
         }
@@ -212,11 +212,11 @@ int main(int argc, char const *argv[])
 
         while(datoPosicionado == 0)
         {
-            if( (limInferior >= distancia && limSuperior > distancia) || discoDelDato == numeroDiscos-1)
+            if( (limInferior <= distancia && limSuperior > distancia) || discoDelDato == numeroDiscos-1)
             {
                 //char* datosCifrados = cifrarDatos(dato);
-
-                write(arregloHijos[discoDelDato]->pipeB[WRITE],dato,100);
+                printf("dato = %f\n",dato->u);
+                write(arregloHijos[discoDelDato]->pipeB[WRITE],dato,sizeof(datos));
                 datoPosicionado = 1;
             }
             else
@@ -241,7 +241,7 @@ int main(int argc, char const *argv[])
     //Leer info obtenida por hijo.
     for(int i = 0 ; i < cantidadHijos;i++)
     {
-        read(arregloHijos[i]->pipeA[READ], buffer, 100);
+        read(arregloHijos[i]->pipeA[READ], buffer, 300);
         printf("Padre = %s\n",buffer);
     }    
 
