@@ -237,8 +237,9 @@ int main(int argc, char const *argv[])
     for(int i = 0 ; i < cantidadHijos;i++)
     {
         read(arregloHijos[i]->pipeA[READ], buffer, 300);
-        printf("Padre = %s\n",buffer);
+        printf("\nDisco %d\n%s\n",i+1,buffer);
     }    
+    printf("\n");
 
     //Cerrar pipes
     for(int i = 0 ; i < cantidadHijos;i++)

@@ -135,7 +135,14 @@ int main(int argc, char const *argv[])
     }
     //OJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOOJJOJOJOOJOJJOOJOJJOOJOJOJOJOJOJOJOJOJO
     //Agregar cantidadVisibilidades a acumMedia; acumMediana. => R/cantidadVisibilidades
-    
+    if(acumMedia != 0 )
+    {
+        acumMedia = acumMedia / cantidadVisibilidades;
+    }
+    if(acumMediana != 0)
+    {
+        acumMediana = acumMediana / cantidadVisibilidades;
+    }
     //Cifrar resultados y entregarlos al papa.
     char *salida;
     salida = cifrarSalida(acumMedia,acumMediana,acumRuido,acumPoten);
