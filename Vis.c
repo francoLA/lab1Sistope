@@ -73,14 +73,17 @@ datos* descifrarEntrada(datos* p_datos, char* entrada)
     return p_datos;
 }
 
-char* cifrarSalida(float mediaReal, float medianaImg, float ruidoTotal, float potencia)
+char* cifrarSalida(float mediaReal, float medianaImg, float ruidoTotal, float potencia,int cantidadVisibilidades)
 {
     char *datosCifrados = malloc(sizeof(char)*BUFFERLECTURA);
     char s_mediaReal[FLOATMAX];
     char s_medianaImg[FLOATMAX];
     char s_ruidoTotal[FLOATMAX];
     char s_potencia[FLOATMAX];
-
+    char s_cantidadVisibilidades[FLOATMAX];
+    char s_pid[FLOATMAX];
+    sprintf(s_cantidadVisibilidades, "%d", cantidadVisibilidades);
+    sprintf(s_pid, "%d", getpid());
     gcvt(mediaReal, 7, s_mediaReal);
     gcvt(medianaImg, 7, s_medianaImg);
     gcvt(ruidoTotal, 7, s_ruidoTotal);
@@ -94,6 +97,12 @@ char* cifrarSalida(float mediaReal, float medianaImg, float ruidoTotal, float po
     strcat(datosCifrados,s_ruidoTotal);
     strcat(datosCifrados,"\nPotencia: ");
     strcat(datosCifrados,s_potencia);
+    strcat(datosCifrados,"\n@");
+    strcat(datosCifrados,"Soy el hijo de pid ");
+    strcat(datosCifrados,s_pid);
+    strcat(datosCifrados,", procesé ");
+    strcat(datosCifrados,s_cantidadVisibilidades);
+    strcat(datosCifrados," visibilidades\n");
 
     return datosCifrados;
 }
@@ -101,30 +110,22 @@ char* cifrarSalida(float mediaReal, float medianaImg, float ruidoTotal, float po
 
 int main(int argc, char const *argv[])
 {
-    
     int verificacion = 0;
     int cantidadVisibilidades = 0;
     float acumMedia = 0;
     float acumMediana = 0;
     float acumRuido = 0;
     float acumPoten= 0;
-    //datos *datos = crearTabla();
     datos* dato = crearTabla();
     char buffer[100];
     
     while(verificacion == 0)
     {
-        
         read(STDIN_FILENO,buffer,BUFFERLECTURA);
         if(strncmp("FIN",buffer,3) == 0){
             verificacion = 1;
             break;}
-        /*
-        if(dato == NULL)
-        {
-            break;
-        }
-        */
+
         dato = descifrarEntrada(dato, buffer);
         acumMedia = mediaReal(dato, acumMedia);
         acumMediana = medianaImaginaria(dato, acumMediana);
@@ -133,8 +134,6 @@ int main(int argc, char const *argv[])
 
         cantidadVisibilidades++;
     }
-    //OJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOJOOJJOJOJOOJOJJOOJOJJOOJOJOJOJOJOJOJOJOJO
-    //Agregar cantidadVisibilidades a acumMedia; acumMediana. => R/cantidadVisibilidades
     if(acumMedia != 0 )
     {
         acumMedia = acumMedia / cantidadVisibilidades;
@@ -143,9 +142,8 @@ int main(int argc, char const *argv[])
     {
         acumMediana = acumMediana / cantidadVisibilidades;
     }
-    //Cifrar resultados y entregarlos al papa.
     char *salida;
-    salida = cifrarSalida(acumMedia,acumMediana,acumRuido,acumPoten);
+    salida = cifrarSalida(acumMedia,acumMediana,acumRuido,acumPoten,cantidadVisibilidades);
     write(STDOUT_FILENO, salida, 200);
     
     return 0;

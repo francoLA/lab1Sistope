@@ -151,6 +151,7 @@ char* cifrarDatos(datos *datos)
     return datosCifrados;
 }
 
+
 int main(int argc, char const *argv[])
 {
     entrada* entradas = analizarEntradas(argc, argv);
@@ -176,7 +177,6 @@ int main(int argc, char const *argv[])
         if( pid == 0)
         {
             char *args[]= {"./vis",NULL};
-            
             dup2(arregloHijos[i]->pipeA[WRITE],STDOUT_FILENO);
             close(arregloHijos[i]->pipeA[READ]); 
             //close(arregloHijos[i]->pipeA[WRITE]);
@@ -210,7 +210,6 @@ int main(int argc, char const *argv[])
             if( (limInferior <= distancia && limSuperior > distancia) || discoDelDato == numeroDiscos-1)
             {
                 char* datosCifrados = cifrarDatos(dato);
-                //printf("dato = %f\n",dato->u);
                 write(arregloHijos[discoDelDato]->pipeB[WRITE],datosCifrados,100);
                 datoPosicionado = 1;
             }
@@ -222,9 +221,6 @@ int main(int argc, char const *argv[])
             }
         } 
     }
-
-    printf("Mande todo\n");
-
     //Matar hijos
     for(int i = 0 ; i < cantidadHijos;i++)
     {
@@ -237,6 +233,10 @@ int main(int argc, char const *argv[])
     for(int i = 0 ; i < cantidadHijos;i++)
     {
         read(arregloHijos[i]->pipeA[READ], buffer, 300);
+
+        if(entradas->bandera == 1){
+            
+        }
         printf("\nDisco %d\n%s\n",i+1,buffer);
     }    
     printf("\n");
