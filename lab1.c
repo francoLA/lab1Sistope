@@ -175,6 +175,7 @@ void posicionarDatos(int cantidadDat, datos* data[], hijo* arregloHijos[], entra
     }
 }
 
+
 void escribirSalida(entrada* entradas, int cantidadHijos, hijo* arregloHijos[]){
 
     char buffer[300];
@@ -202,7 +203,7 @@ void crearHijos(int cantidadHijos, hijo* arregloHijos[]){
         pid = fork();
         if( pid == 0)
         {
-            char *args[]= {"./vis",NULL};
+            char *args[]= {"./vis","-lm",NULL};
             dup2(arregloHijos[i]->pipeA[WRITE],STDOUT_FILENO);
             close(arregloHijos[i]->pipeA[READ]); 
             //close(arregloHijos[i]->pipeA[WRITE]);
@@ -242,7 +243,10 @@ int main(int argc, char const *argv[])
     //Matar hijos
     for(int i = 0 ; i < cantidadHijos;i++)
     {
+        char numeroDisco[10];
+        sprintf(numeroDisco, "%d",i);
         write(arregloHijos[i]->pipeB[WRITE],"FIN",100);
+        write(arregloHijos[i]->pipeB[WRITE],&numeroDisco,100);
         wait(NULL);
     }
 
