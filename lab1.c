@@ -276,15 +276,14 @@ int main(int argc, char const *argv[])
         pipe(arregloHijos[i]->pipeB);
     }
 
-    //Creacoion de los procesos hijos.
+    //Creacion de los procesos hijos.
     crearHijos(cantidadHijos, arregloHijos);
     
     //Proceso asignacion de hijos.
     posicionarDatos(cantidadDat, data, arregloHijos, entradas);
 
     //Matar hijos
-    for(int i = 0 ; i < cantidadHijos;i++)
-    {
+    for(int i = 0 ; i < cantidadHijos;i++){
         char numeroDisco[10];
         sprintf(numeroDisco, "%d",i);
         write(arregloHijos[i]->pipeB[WRITE],"FIN",100);
@@ -295,8 +294,7 @@ int main(int argc, char const *argv[])
     escribirSalida(entradas, cantidadHijos, arregloHijos);
 
     //Cerrar pipes y liberando hijos.
-    for(int i = 0 ; i < cantidadHijos;i++)
-    {
+    for(int i = 0 ; i < cantidadHijos;i++){
         close(arregloHijos[i]->pipeA[WRITE]);
         close(arregloHijos[i]->pipeA[READ]);
         close(arregloHijos[i]->pipeB[WRITE]);
@@ -305,8 +303,7 @@ int main(int argc, char const *argv[])
     }
 
     //Liberar memoria dato
-    for(int i = 0; i < cantidadDatos;i++)
-    {
+    for(int i = 0; i < cantidadDat;i++){
         free(data[i]);
     }
 
