@@ -211,7 +211,7 @@ void posicionarDatos(int cantidadDat, datos* data[], hijo* arregloHijos[], entra
                 limSuperior = limSuperior + entradas -> ancho;
                 discoDelDato++;
             }
-        } 
+        }
     }
 }
 
@@ -222,9 +222,7 @@ void posicionarDatos(int cantidadDat, datos* data[], hijo* arregloHijos[], entra
 void escribirSalida(entrada* entradas, int cantidadHijos, hijo* arregloHijos[]){
 
     char buffer[300];
-
     FILE *file = fopen(entradas->archivoS,"w");
-
     for(int i = 0 ; i < cantidadHijos;i++)
     {
         read(arregloHijos[i]->pipeA[READ], buffer, 300);
@@ -232,8 +230,7 @@ void escribirSalida(entrada* entradas, int cantidadHijos, hijo* arregloHijos[]){
         fputs(palabra,file);
         palabra = strtok(NULL,"@");
         if(entradas->bandera == 1){printf("%s",palabra);}
-    }    
-    
+    }
     fclose(file);
 }
 
@@ -242,9 +239,7 @@ void escribirSalida(entrada* entradas, int cantidadHijos, hijo* arregloHijos[]){
 // -Salidas: -.
 
 void crearHijos(int cantidadHijos, hijo* arregloHijos[]){
-
     int pid;
-
     for(int i = 0 ; i < cantidadHijos;i++)
     {
         pid = fork();
@@ -299,14 +294,24 @@ int main(int argc, char const *argv[])
 
     escribirSalida(entradas, cantidadHijos, arregloHijos);
 
-    //Cerrar pipes
+    //Cerrar pipes y liberando hijos.
     for(int i = 0 ; i < cantidadHijos;i++)
     {
         close(arregloHijos[i]->pipeA[WRITE]);
         close(arregloHijos[i]->pipeA[READ]);
         close(arregloHijos[i]->pipeB[WRITE]);
         close(arregloHijos[i]->pipeB[READ]);
+        free(arregloHijos[i]);
     }
+
+    //Liberar memoria dato
+    for(int i = 0; i < cantidadDatos;i++)
+    {
+        free(data[i]);
+    }
+
+    //Liberar entradas
+    free(entradas);
 
     return 0;
 }
