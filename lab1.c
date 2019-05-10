@@ -15,12 +15,20 @@
 
 char* parametros[NUMEROENTRADAS] = {"-i","-o","-n","-d","-b"};
 
+// -Descripcion:  Crea un nuevo dato del tipo hijo.
+// -Enntardas: -
+// -Salidas: un nuevo dato de tipo hijo.
+
 hijo* crearHijo()
 {
     hijo *p_hijo = malloc(sizeof(hijo));
     p_hijo->pid = -1;
     return p_hijo;
 }
+
+// -Descripcion:  Crea un nuevo dato del tipo entrada.
+// -Enntardas: -
+// -Salidas: un nuevo dato de tipo entrada.
 
 entrada* crearEntrada()
 {
@@ -33,10 +41,18 @@ entrada* crearEntrada()
     return p_entrada;
 }
 
+// -Descripcion:  Crea un nuevo dato del tipo datos.
+// -Enntardas: -
+// -Salidas: un nuevo dato de tipo datos.
+
 datos *crearDato(){
     datos *nuevo = malloc(sizeof(datos));
     return nuevo;
 }
+
+// -Descripcion: Calcula la cantidad de datos en el archivo de entrada.
+// -Enntardas: const char *nombreArchivo
+// -Salidas: un entero correspondiente a la cantidad de datos.
 
 int cantidadDatos(const char *nombreArchivo){
 
@@ -51,6 +67,10 @@ int cantidadDatos(const char *nombreArchivo){
     fclose(archivo);
     return cantidad;
 }
+
+// -Descripcion: Realiza la lectura del archivo de entrada y guarda los datos en un arreglo del tipo datos.
+// -Enntardas: const char *nombreArchivo, datos *data[]
+// -Salidas: -.
 
 void leerArchivo(const char *nombreArchivo, datos *data[])
 {
@@ -77,6 +97,10 @@ void leerArchivo(const char *nombreArchivo, datos *data[])
     fclose(archivo);
 
 }
+
+// -Descripcion: Se encarga de verificar las entradas necesarias para la ejecucion del programa.
+// -Enntardas: int argc,char const *argv[]
+// -Salidas: Un nuevo tipo de dato entrada.
 
 entrada* analizarEntradas(int argc,char const *argv[])
 {
@@ -110,6 +134,10 @@ entrada* analizarEntradas(int argc,char const *argv[])
     }
 }
 
+// -Descripcion: Calcula la distancia de un dato determinado.
+// -Enntardas: datos* datos.
+// -Salidas: Un dato de tipo float correspondiente a la distancia calculada.
+
 float distanciaVisibilidad(datos *datos)
 {
     float u = datos->u;
@@ -118,11 +146,19 @@ float distanciaVisibilidad(datos *datos)
     return sqrtf(resultado);
 }
 
+// -Descripcion: Concatena dos strings y agrega una coma al final.
+// -Enntardas: char* a, char* b.
+// -Salidas: -.
+
 void concatenarString(char* a, char* b)
 {
     strcat(a, b);
     strcat(a,",");
 }
+
+// -Descripcion: Cifra los datos para poder entregarlos al hijo.
+// -Enntardas: datos *datos.
+// -Salidas: Una cadena de caracteres correspondiente a los datos.
 
 char* cifrarDatos(datos *datos)
 {
@@ -144,6 +180,10 @@ char* cifrarDatos(datos *datos)
     strcat(datosCifrados,ruido);
     return datosCifrados;
 }
+
+// -Descripcion: Se encarga de verificar las entradas necesarias para la ejecucion del programa.
+// -Enntardas: int argc,char const *argv[]
+// -Salidas: Un nuevo tipo de dato entrada.
 
 void posicionarDatos(int cantidadDat, datos* data[], hijo* arregloHijos[], entrada* entradas){
 
@@ -175,6 +215,10 @@ void posicionarDatos(int cantidadDat, datos* data[], hijo* arregloHijos[], entra
     }
 }
 
+// -Descripcion: Escribe los resultados del programa en el archivo de salida.
+// -Enntardas: entrada* entradas, int cantidadHijos, hijo* arregloHijos[].
+// -Salidas: -.
+
 void escribirSalida(entrada* entradas, int cantidadHijos, hijo* arregloHijos[]){
 
     char buffer[300];
@@ -192,6 +236,10 @@ void escribirSalida(entrada* entradas, int cantidadHijos, hijo* arregloHijos[]){
     
     fclose(file);
 }
+
+// -Descripcion: Crea los hijos para realizar los calculos de un disco.
+// -Enntardas: int cantidadHijos, hijo* arregloHijos[].
+// -Salidas: -.
 
 void crearHijos(int cantidadHijos, hijo* arregloHijos[]){
 
