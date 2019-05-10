@@ -73,7 +73,7 @@ datos* descifrarEntrada(datos* p_datos, char* entrada)
     return p_datos;
 }
 
-char* cifrarSalida(float mediaReal, float medianaImg, float ruidoTotal, float potencia,int cantidadVisibilidades)
+char* cifrarSalida(float mediaReal, float medianaImg, float ruidoTotal, float potencia,int cantidadVisibilidades,char* numeroDisco)
 {
     char *datosCifrados = malloc(sizeof(char)*BUFFERLECTURA);
     char s_mediaReal[FLOATMAX];
@@ -82,14 +82,17 @@ char* cifrarSalida(float mediaReal, float medianaImg, float ruidoTotal, float po
     char s_potencia[FLOATMAX];
     char s_cantidadVisibilidades[FLOATMAX];
     char s_pid[FLOATMAX];
+    char s_numeroDisco[FLOATMAX];
     sprintf(s_cantidadVisibilidades, "%d", cantidadVisibilidades);
     sprintf(s_pid, "%d", getpid());
     gcvt(mediaReal, 7, s_mediaReal);
     gcvt(medianaImg, 7, s_medianaImg);
     gcvt(ruidoTotal, 7, s_ruidoTotal);
     gcvt(potencia, 7, s_potencia);
-
-    strcat(datosCifrados,"Media real: ");
+    
+    strcat(datosCifrados,"Disco: ");
+    strcat(datosCifrados,numeroDisco);
+    strcat(datosCifrados,"\nMedia real: ");
     strcat(datosCifrados,s_mediaReal);
     strcat(datosCifrados,"\nMedia imaginaria: ");
     strcat(datosCifrados,s_medianaImg);
@@ -134,6 +137,7 @@ int main(int argc, char const *argv[])
 
         cantidadVisibilidades++;
     }
+
     if(acumMedia != 0 )
     {
         acumMedia = acumMedia / cantidadVisibilidades;
@@ -143,7 +147,9 @@ int main(int argc, char const *argv[])
         acumMediana = acumMediana / cantidadVisibilidades;
     }
     char *salida;
-    salida = cifrarSalida(acumMedia,acumMediana,acumRuido,acumPoten,cantidadVisibilidades);
+
+    read(STDIN_FILENO,buffer,BUFFERLECTURA);
+    salida = cifrarSalida(acumMedia,acumMediana,acumRuido,acumPoten,cantidadVisibilidades,buffer);
     write(STDOUT_FILENO, salida, 200);
     
     return 0;
